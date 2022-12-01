@@ -1,6 +1,7 @@
 package concurrent
 
 import (
+	"sync"
 	"testing"
 	"time"
 )
@@ -20,6 +21,23 @@ func TestChannel(t *testing.T) {
 	i += <-ch
 	i += <-ch
 
+	time.Sleep(time.Second)
+	t.Log(i)
+}
+
+func TestRaceCondition(t *testing.T) {
+	var i int
+	var mx sync.Mutex
+	go func() {
+		mx.Lock()
+		defer mx.Unlock()
+		i = 1
+	}()
+	go func() {
+		mx.Lock()
+		defer mx.Unlock()
+		i = 2
+	}()
 	time.Sleep(time.Second)
 	t.Log(i)
 }

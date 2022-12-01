@@ -2,25 +2,15 @@ package main
 
 import (
 	"fmt"
-	"sync"
-	"time"
 )
 
 func main() {
-	var i int64
-	var mx sync.Mutex
+	i := 0
+	c := make(chan struct{})
 	go func() {
-		mx.Lock()
-		defer mx.Unlock()
-		i++
+		fmt.Printf("i: %v\n", i)
+		<-c
 	}()
-
-	go func() {
-		mx.Lock()
-		defer mx.Unlock()
-		i++
-	}()
-
-	time.Sleep(time.Second)
-	fmt.Printf("i: %v\n", i)
+	i++
+	close(c)
 }
