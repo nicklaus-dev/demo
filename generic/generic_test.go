@@ -22,3 +22,13 @@ func getAny[T any](value T) T {
 func mapAny[K, T any](first K, second T) (K, T) {
 	return first, second
 }
+
+func filter[T any](list []T, filterFn func(T) bool) []T {
+	var result []T
+	for _, v := range list {
+		if filterFn(v) {
+			result = append(result, v)
+		}
+	}
+	return result
+}
