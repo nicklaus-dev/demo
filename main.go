@@ -3,6 +3,13 @@ package main
 import "fmt"
 
 func main() {
-	fmt.Println("Hello World!")
-	panic("hello, there is a panic")
+	i := 0
+	//ch := make(chan struct{}, 1) buffered channel
+	ch := make(chan struct{}) // unbufferd channel
+	go func() {
+		i = 1
+		<-ch
+	}()
+	ch <- struct{}{}
+	fmt.Printf("i: %v\n", i)
 }
