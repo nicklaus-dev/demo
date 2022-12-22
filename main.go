@@ -1,15 +1,64 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"io"
+	"sync"
+	"sync/atomic"
+	"time"
+)
 
 func main() {
-	i := 0
-	//ch := make(chan struct{}, 1) buffered channel
-	ch := make(chan struct{}) // unbufferd channel
-	go func() {
-		i = 1
-		<-ch
-	}()
-	ch <- struct{}{}
-	fmt.Printf("i: %v\n", i)
+	n := 1000
+	wg := sync.WaitGroup{}
+	wg.Add(n)
+	start := time.Now()
+	for i := 0; i < n; i++ {
+		go func() {
+			defer wg.Done()
+			handle()
+		}()
+	}
+	wg.Wait()
+	end := time.Now()
+	cost := end.Sub(start).Milliseconds()
+	fmt.Printf("cost: %v\n", cost)
+}
+
+func handle() {
+	time.Sleep(time.Second)
+}
+
+func read(r io.Reader) (int, error) {
+	var count int64
+	wg := sync.WaitGroup{}
+	n := 10
+
+	ch := make(chan []byte, n)
+	wg.Add(n)
+	for i := 0; i < n; i++ {
+		go func() {
+			defer wg.Done()
+			for b := range ch {
+				v := task(b)
+				atomic.AddInt64(&count, v)
+			}
+		}()
+	}
+
+	for {
+		b := make([]byte, 1024)
+		_, err := r.Read(b)
+		if err == io.EOF {
+			break
+		}
+		ch <- b
+	}
+	close(ch)
+	wg.Wait()
+	return int(count), nil
+}
+
+func task(b []byte) int64 {
+	return 1
 }
