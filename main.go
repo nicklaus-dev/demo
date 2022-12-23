@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
+	"runtime"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -10,6 +11,8 @@ import (
 
 func main() {
 	n := 1000
+	i := runtime.NumCPU()
+	fmt.Printf("i: %v\n", i)
 	wg := sync.WaitGroup{}
 	wg.Add(n)
 	start := time.Now()
