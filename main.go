@@ -10,6 +10,8 @@ import (
 )
 
 func main() {
+	w := newWatcher()
+	defer w.close()
 	n := 1000
 	i := runtime.NumCPU()
 	fmt.Printf("i: %v\n", i)
@@ -60,4 +62,24 @@ func read(r io.Reader) (int, error) {
 	close(ch)
 	wg.Wait()
 	return int(count), nil
+}
+
+func task(b []byte) int64 {
+	return 1
+}
+
+type watcher struct {
+}
+
+func (w watcher) watch() {
+}
+
+func (w watcher) close() {
+	// close all resource
+}
+
+func newWatcher() watcher {
+	w := watcher{}
+	go w.watch()
+	return w
 }
