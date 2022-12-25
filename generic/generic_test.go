@@ -32,3 +32,11 @@ func filter[T any](list []T, filterFn func(T) bool) []T {
 	}
 	return result
 }
+
+func makeGo() {	
+	ch := make(chan int)
+
+	for v := range ch {
+		_ = v
+	}
+}

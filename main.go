@@ -61,7 +61,3 @@ func read(r io.Reader) (int, error) {
 	wg.Wait()
 	return int(count), nil
 }
-
-func task(b []byte) int64 {
-	return 1
-}
