@@ -29,4 +29,6 @@ func main() {
 
 	time.Sleep(time.Second)
 	fmt.Printf("c.counters: %v\n", c.counters)
+
+	
 }
