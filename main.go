@@ -1,33 +1,15 @@
 package main
 
 import (
-	"fmt"
 	"io"
-	"runtime"
 	"sync"
 	"sync/atomic"
+	"testing"
 	"time"
 )
 
 func main() {
-	w := newWatcher()
-	defer w.close()
-	n := 1000
-	i := runtime.NumCPU()
-	fmt.Printf("i: %v\n", i)
-	wg := sync.WaitGroup{}
-	wg.Add(n)
-	start := time.Now()
-	for i := 0; i < n; i++ {
-		go func() {
-			defer wg.Done()
-			handle()
-		}()
-	}
-	wg.Wait()
-	end := time.Now()
-	cost := end.Sub(start).Milliseconds()
-	fmt.Printf("cost: %v\n", cost)
+
 }
 
 func handle() {
@@ -82,4 +64,14 @@ func newWatcher() watcher {
 	w := watcher{}
 	go w.watch()
 	return w
+}
+
+func BenchMarkFoo(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		foo()
+	}
+}
+
+func foo() string {
+	return "foo"
 }

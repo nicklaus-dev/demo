@@ -3,13 +3,13 @@ package generic
 import (
 	"reflect"
 	"testing"
+	"fmt"
 )
 
 func TestAny(t *testing.T) {
 	i := getAny("nick")
 	itype := reflect.TypeOf(i)
 	t.Log(itype)
-
 	s, i2 := mapAny("strings", 1)
 	t.Log(s)
 	t.Log(i2)
@@ -38,5 +38,9 @@ func makeGo() {
 
 	for v := range ch {
 		_ = v
+	}
+
+	for i := 0; i < 10; i++ {
+		fmt.Println("hello world")
 	}
 }
