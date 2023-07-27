@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"sync"
 	"sync/atomic"
@@ -9,7 +10,32 @@ import (
 )
 
 func main() {
+	fmt.Println(fibonacciV2(6))
+}
 
+// 1, 1, 2, 3, 5, 8, 13
+func fibonacci(c, quit chan int) {
+	x, y := 0, 1
+	for {
+		select {
+		case c <- x:
+			x, y = y, x+y
+		case <-quit:
+			return
+		}
+	}
+}
+
+func fibonacciV2(n uint) uint {
+	if n < 2 {
+		return n
+	}
+	return fibonacciV2(n - 1) + fibonacciV2(n - 2)
+}
+
+func doRequest() bool {
+	time.Sleep(time.Millisecond * 50)
+	return true
 }
 
 func handle() {

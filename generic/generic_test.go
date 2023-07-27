@@ -1,12 +1,15 @@
 package generic
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
-	"fmt"
 )
 
 func TestAny(t *testing.T) {
+	t.Cleanup(func() {
+		t.Log("TestAny finish!")
+	})
 	i := getAny("nick")
 	itype := reflect.TypeOf(i)
 	t.Log(itype)
