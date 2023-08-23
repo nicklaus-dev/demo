@@ -91,15 +91,43 @@ func fanIn(input1, input2 <-chan string) <-chan string {
 type Ball struct{ Hits int }
 
 func main() {
-	ch1 := make(chan struct{})
-	ch2 := make(chan struct{})
-	ch3 := make(chan struct{})
-	ch4 := make(chan struct{})
-	ch5 := make(chan struct{})
-	go func() {
-		defer close(ch5)
+	// done := make(chan struct{})
+	// defer close(done)
+
+	// out1, out2 := tee(done, take(done, repeat(done, 1, 2), 4))
+	// for e := range out1 {
+	// 	fmt.Printf("out1:%v out2:%v \n", e, <-out2)
+	// }
+
+	// done := make(chan struct{})
+	// defer close(done)
+
+	// ch1 := take(done, repeat(done, 1, 2), 4)
+
+	// ch2 := make(chan any)
+	// go func ()  {
+	// 	for e := range ch1 {
+	// 		var ch2 = ch2
+	// 		ch2 <- e
+	// 	}
+	// }()
+
+	// for e := range ch2 {
+	// 	fmt.Println(e)
+	// }
+
+	ch := make(chan any)
+	go func ()  {
+		defer close(ch)
+		ch <- 1
+		var ch = ch
+		ch <- 2
 	}()
-	<-orChannel(ch1, ch2, ch3, ch4, ch5)
+
+	for e := range ch {
+		fmt.Println(e)
+	}
+
 }
 
 func player(name string, table chan *Ball) {
@@ -150,4 +178,85 @@ func orChannel(receives ...<-chan struct{}) <-chan struct{} {
 	}()
 	fmt.Println("call orChannel")
 	return orDone
+}
+
+func repeat(done <-chan struct{}, values ...any) <-chan any {
+	ch := make(chan any)
+	go func() {
+		defer close(ch)
+		for {
+			for _, v := range values {
+				select {
+				case <-done:
+					return
+				case ch <- v:
+
+				}
+			}
+		}
+	}()
+	return ch
+}
+
+func take(done <-chan struct{}, inputStream <-chan any, num int) <-chan any {
+	ch := make(chan any)
+	go func() {
+		defer close(ch)
+		for i := 0; i < num; i++ {
+			select {
+			case <-done:
+				return
+			case ch <- <-inputStream:
+
+			}
+		}
+	}()
+	return ch
+}
+
+func orDone(done <-chan struct{}, valStream <-chan any) <-chan any {
+	ch := make(chan any)
+	go func() {
+		defer close(ch)
+		for {
+			select {
+			case <-done:
+				return
+			case val, ok := <-valStream:
+				if !ok {
+					return
+				}
+				select {
+				case ch <- val:
+				case <-done:
+					return
+				}
+			}
+		}
+	}()
+	return ch
+}
+
+func tee(done <-chan struct{}, ch <-chan any) (<-chan any, <-chan any) {
+	out1, out2 := make(chan any), make(chan any)
+	go func() {
+		defer close(out1)
+		defer close(out2)
+		fmt.Println("before", out1, out2)
+		for v := range orDone(done, ch) {
+			var out1, out2 = out1, out2
+			fmt.Println(out1)
+			fmt.Println(out2)
+			for i := 0; i < 2; i++ {
+				select {
+				case out1 <- v:
+					out1 = nil
+				case out2 <- v:
+					out2 = nil
+				}
+			}
+		}
+		fmt.Println("after", out1, out2)
+	}()
+	return out1, out2
 }
