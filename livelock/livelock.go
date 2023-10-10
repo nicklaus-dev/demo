@@ -10,7 +10,6 @@ import (
 
 func main() {
 	var pool sync.Pool
-	pool.Put()
 	pool.Get()
 	cadence := sync.NewCond(&sync.Mutex{})
 	go func() {

@@ -1,16 +1,30 @@
 package main
-
+ 
 import (
 	"fmt"
 	"io"
+
+	"strings"
 	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
 )
 
+type MySlice []string
+
+func (s MySlice) String() string {
+	return strings.Join(s, "+")
+}
+
 func main() {
-	fmt.Println(fibonacciV2(6))
+	m := MySlice{"1", "2", "3"}
+	s := clone(m)
+	fmt.Println(s)
+}
+
+func clone[S ~[]E, E any](s S) S {
+	return s
 }
 
 // 1, 1, 2, 3, 5, 8, 13
@@ -30,7 +44,7 @@ func fibonacciV2(n uint) uint {
 	if n < 2 {
 		return n
 	}
-	return fibonacciV2(n - 1) + fibonacciV2(n - 2)
+	return fibonacciV2(n-1) + fibonacciV2(n-2)
 }
 
 func doRequest() bool {

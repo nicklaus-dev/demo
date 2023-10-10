@@ -31,6 +31,12 @@ func main() {
 }
 
 func do(ctx context.Context) (string, error) {
+	if deadline, ok := ctx.Deadline(); ok {
+		if deadline.Sub(time.Now().Add(time.Minute)) < 0 {
+			return "", context.DeadlineExceeded
+		}
+	}
+
 	select {
 	case <-ctx.Done():
 		return "", ctx.Err()
